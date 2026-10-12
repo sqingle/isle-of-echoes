@@ -1,8 +1,9 @@
 /** Server-side text-to-speech for the Archivist. Picks a provider from the environment. */
 
-export type Provider = "elevenlabs" | "openai";
+export type Provider = "kokoro" | "elevenlabs" | "openai";
 
 export function provider(): Provider | null {
+  if (process.env.KOKORO_BASE_URL) return "kokoro";
   if (process.env.ELEVENLABS_API_KEY) return "elevenlabs";
   if (process.env.OPENAI_API_KEY) return "openai";
   return null;
@@ -15,6 +16,23 @@ const PERSONA =
 
 export async function synthesize(text: string, rate: number | null): Promise<Response> {
   const p = provider();
+  if (p === "kokoro") {
+    // Kokoro Web (https://github.com/eduardolat/kokoro-web) self-hosted: an OpenAI-compatible API
+    const base = process.env.KOKORO_BASE_URL!.replace(/\/+$/, "");
+    const headers: Record<string, string> = { "content-type": "application/json" };
+    if (process.env.KOKORO_API_KEY) headers.authorization = `Bearer ${process.env.KOKORO_API_KEY}`;
+    return fetch(`${base}/audio/speech`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: process.env.KOKORO_MODEL ?? "model_q8f16",
+        voice: process.env.KOKORO_VOICE ?? "bm_fable",
+        input: text,
+        response_format: "mp3",
+        speed: rate ? Math.min(1.1, Math.max(0.6, rate)) : 0.9,
+      }),
+    });
+  }
   if (p === "elevenlabs") {
     const voice = process.env.ELEVENLABS_VOICE_ID ?? "JBFqnCBsd6RMkjVDRZzb"; // a warm, mature narrator voice
     return fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`, {

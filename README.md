@@ -82,15 +82,19 @@ unless no provider is configured, in which case the browser voice is used as a f
 
 | Variable | Purpose |
 | --- | --- |
+| `KOKORO_BASE_URL` (+ `KOKORO_API_KEY`, `KOKORO_VOICE`) | [Kokoro Web](https://github.com/eduardolat/kokoro-web), free and open source, self-hosted (takes priority) |
 | `OPENAI_API_KEY` | OpenAI `gpt-4o-mini-tts`, with an “Archivist” voice persona (`ARCHIVIST_VOICE`, default `sage`) |
-| `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | ElevenLabs instead (takes priority when set) |
+| `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | ElevenLabs instead (used when Kokoro is not set) |
 
 Each phrase is generated once and then served from the CDN (`Cache-Control: immutable`), so cost is small and repeat plays are
 instant. Only short item text is sent to the provider; no names or scores. The endpoint accepts same-origin requests only,
 caps text length and rate-limits per client, but anyone who can load the site can trigger voice generation, so keep Vercel
 Deployment Protection on, or set a spend limit with your provider.
 
-On Vercel: `npx vercel env add OPENAI_API_KEY production`, then redeploy.
+**Kokoro.** Run `ghcr.io/eduardolat/kokoro-web:latest` on any Docker host (it cannot run on Vercel itself), for example
+`docker run -p 3000:3000 -e KW_SECRET_API_KEY=... -v ./kokoro-cache:/kokoro/cache ghcr.io/eduardolat/kokoro-web:latest`,
+then set `KOKORO_BASE_URL=https://<your-host>/api/v1` and `KOKORO_API_KEY` on Vercel (`npx vercel env add ... production`) and redeploy.
+Natural voices come from the 82M Kokoro model; there is no per-request cost beyond the host.
 
 Phoneme strings (for example `/s/-/i/-/t/`) are respelled for speech and are approximate. The Keeper’s own voice remains the
 gold standard for clinical use.
