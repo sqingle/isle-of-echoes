@@ -52,6 +52,14 @@ function probeVoice(): Promise<void> {
   return probe;
 }
 
+/** voice-server clips are fetched strictly one at a time (the server garbles parallel renders) */
+let apiChain: Promise<unknown> = Promise.resolve();
+const inSequence = <T>(job: () => Promise<T>): Promise<T> => {
+  const run = apiChain.then(job, job);
+  apiChain = run.catch(() => {});
+  return run;
+};
+
 const clips = new Map<string, Promise<string | null>>();
 
 function clip(text: string, rate?: number): Promise<string | null> {
@@ -69,9 +77,9 @@ function clip(text: string, rate?: number): Promise<string | null> {
       });
       return c;
     }
-    const q = new URLSearchParams({ t: text });
+    const q = new URLSearchParams({ t: text, v: "2" }); // v bumps past any clip cached before the serialisation fix
     if (rate) q.set("r", String(Math.round(rate * 10) / 10));
-    c = fetch(`/api/narrate?${q}`)
+    c = inSequence(() => fetch(`/api/narrate?${q}`))
       .then(async (r) => {
         if (r.status === 501) neural = false;
         if (!r.ok) return null;

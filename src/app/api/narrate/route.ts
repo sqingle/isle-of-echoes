@@ -3,6 +3,14 @@ import { provider, synthesize } from "@/lib/tts";
 const MAX_CHARS = 320;
 const hits = new Map<string, number[]>();
 
+/** the Kokoro server garbles audio under concurrent requests, so this instance sends one at a time */
+let upstreamQueue: Promise<unknown> = Promise.resolve();
+function serial<T>(job: () => Promise<T>): Promise<T> {
+  const run = upstreamQueue.then(job, job);
+  upstreamQueue = run.catch(() => {});
+  return run;
+}
+
 /** crude per-instance limiter: 90 uncached clips a minute per client */
 function limited(ip: string): boolean {
   const now = Date.now();
@@ -28,7 +36,7 @@ export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
   if (limited(ip)) return new Response("Slow down", { status: 429 });
 
-  const upstream = await synthesize(text, rate);
+  const upstream = await serial(() => synthesize(text, rate));
   if (!upstream.ok || !upstream.body) return new Response("Voice provider error", { status: 502 });
 
   return new Response(upstream.body, {
