@@ -70,8 +70,27 @@ Weathered sandstone columns, rusted iron gears, moss on basalt, hazy gold light 
 MYST-style amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. Every scene is drawn in code
 as SVG; no third-party artwork is included.
 
-## Notes on the voice
+## The Archivist (narration)
 
-The “Hear it” button uses the browser’s speech synthesis for real words, digit strings (one per second) and nonword
-repetition. Devices vary and may blur nonwords, and phoneme strings (for example `/s/-/i/-/t/`) cannot be voiced reliably,
-so the Keeper’s own voice is the standard and the button is only an aid. It can be turned off in setup.
+A hooded keeper greets the traveler and guides the whole game aloud, so the child never has to read: the welcome on the
+title screen, a spoken introduction and rules for every realm, a short lead-in before each item, the items themselves
+(words, respelled sounds such as “sss” and “tuh”, digits at one per second, nonwords), and a closing line for each realm.
+Memory items (digits, nonword repetition) are spoken once only, as the guide requires. Tap the Archivist to hear a line again.
+
+**Natural voice.** Speech comes from a text-to-speech provider through `/api/narrate`, never from the device’s system voice,
+unless no provider is configured, in which case the browser voice is used as a fallback. Set one provider (see `.env.example`):
+
+| Variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | OpenAI `gpt-4o-mini-tts`, with an “Archivist” voice persona (`ARCHIVIST_VOICE`, default `sage`) |
+| `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | ElevenLabs instead (takes priority when set) |
+
+Each phrase is generated once and then served from the CDN (`Cache-Control: immutable`), so cost is small and repeat plays are
+instant. Only short item text is sent to the provider; no names or scores. The endpoint accepts same-origin requests only,
+caps text length and rate-limits per client, but anyone who can load the site can trigger voice generation, so keep Vercel
+Deployment Protection on, or set a spend limit with your provider.
+
+On Vercel: `npx vercel env add OPENAI_API_KEY production`, then redeploy.
+
+Phoneme strings (for example `/s/-/i/-/t/`) are respelled for speech and are approximate. The Keeper’s own voice remains the
+gold standard for clinical use.

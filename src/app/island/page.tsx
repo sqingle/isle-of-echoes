@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import { IslandMap } from "@/components/IslandMap";
 import { SceneBackdrop } from "@/components/SceneBackdrop";
 import { useSession } from "@/components/SessionProvider";
+import { Archivist } from "@/components/Archivist";
+import { ISLAND } from "@/lib/narration";
+import { useCanSpeak, useNarrate } from "@/lib/useNarrate";
 import { LOCATIONS, LOCATION_BY_ID, RAPID_TASKS, TIERS, type LocationId } from "@/lib/game";
 
 export default function Island() {
@@ -24,6 +27,13 @@ export default function Island() {
   const visited = LOCATIONS.filter((l) => done[l.id]).length;
   const sel = selected ? LOCATION_BY_ID[selected] : null;
   const tier = TIERS[settings.tier];
+  const canSpeakNow = useCanSpeak();
+  const voiceOn = settings.voice && canSpeakNow && configured;
+  const { speaking, replay } = useNarrate(
+    sel ? [{ text: `This is ${sel.name}.`, pause: 300 }, { text: sel.blurb }, { text: "Tap the golden button, and we will go in." }] : ISLAND,
+    voiceOn,
+    sel?.id ?? "island",
+  );
 
   return (
     <main className="relative min-h-dvh px-4 pt-5 pb-10 md:px-8">
@@ -62,7 +72,9 @@ export default function Island() {
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <section className="plaque min-h-[10.5rem] p-6" aria-live="polite">
+          <section className="plaque flex min-h-[10.5rem] items-center gap-5 p-6" aria-live="polite">
+            <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
+            <div className="min-w-0 flex-1">
             {sel ? (
               <div className="rise" key={sel.id}>
                 <p className="eyebrow">
@@ -88,6 +100,7 @@ export default function Island() {
                 </p>
               </div>
             )}
+            </div>
           </section>
 
           <nav aria-label="Realms" className="plaque p-4">

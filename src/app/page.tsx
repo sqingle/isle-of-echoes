@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Greeting } from "@/components/Greeting";
 import { IslandMap } from "@/components/IslandMap";
 
 export default function Title() {
@@ -31,7 +32,8 @@ export default function Title() {
             Eight realms wait on a silent island. In each, a Keeper and a young traveler trade sounds, words and numbers, and the island
             answers back.
           </p>
-          <div className="rise flex flex-col gap-3 sm:flex-row md:flex-col" style={{ animationDelay: "0.6s" }}>
+          <div className="rise flex flex-col gap-3 sm:flex-row md:flex-col md:items-stretch" style={{ animationDelay: "0.6s" }}>
+            <Greeting />
             <Link href="/setup" className="btn btn-brass">
               Step onto the island
             </Link>

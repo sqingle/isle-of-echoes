@@ -1,5 +1,7 @@
 import itemBankJson from "@/data/itemBank.json";
 import rapidJson from "@/data/rapidNaming.json";
+import { blendSay, digitsSay, elisionSay, isolationSay, nonwordRepSay, segmentationSay } from "./narration";
+import type { Segment } from "./speech";
 
 /* ------------------------------------------------------------------ */
 /* Static definitions                                                  */
@@ -172,9 +174,11 @@ export interface TrialItem {
   answer: string;
   /** segmentation: the sounds / parts the child should produce */
   parts?: string[];
-  /** text that browser speech can render reliably (real words, digits, nonwords) */
-  speak?: string;
-  /** digits: spoken one per second */
+  /** the full spoken script, so the child never has to read */
+  say: Segment[];
+  /** memory items are read once only, per the guide */
+  noReplay?: boolean;
+  /** digits: shown to the Keeper and lit up as they are spoken */
   digits?: string[];
 }
 
@@ -217,10 +221,10 @@ function prepare(kind: SubtestId, row: RawRow): TrialItem {
   switch (kind) {
     case "elision": {
       const e = elisionLines(row.stimulus, row.instruction ?? "");
-      return { ...base, ...e, speak: row.stimulus };
+      return { ...base, ...e, say: elisionSay(row.stimulus, (row.instruction ?? "").replace(/^Say “.*?” /, "")) };
     }
     case "blending": {
-      return { ...base, ...blendLines(row.stimulus) };
+      return { ...base, ...blendLines(row.stimulus), say: blendSay(row.stimulus) };
     }
     case "segmentation": {
       const parts = parseParts(row.target);
@@ -235,23 +239,25 @@ function prepare(kind: SubtestId, row: RawRow): TrialItem {
         ],
         tag: wordParts ? parenOf(row.target) : undefined,
         parts,
-        speak: row.stimulus,
+        say: segmentationSay(row.stimulus, wordParts),
       };
     }
     case "isolation": {
       return {
         ...base,
         lines: [row.instruction ?? ""],
-        speak: (row.instruction ?? "").replace(/[“”]/g, ""),
+        say: isolationSay(row.instruction ?? ""),
       };
     }
     case "nonwordEB": {
       if (row.taskType === "Elision") {
-        const e = elisionLines(row.stimulus.match(/“(.*?)”/)?.[1] ?? "", row.stimulus.replace(/^Say “.*?” /, ""));
-        return { ...base, ...e, tag: `Elision · ${e.tag ?? ""}`.replace(/ · $/, "") };
+        const word = row.stimulus.match(/“(.*?)”/)?.[1] ?? "";
+        const rest = row.stimulus.replace(/^Say “.*?” /, "");
+        const e = elisionLines(word, rest);
+        return { ...base, ...e, tag: `Elision · ${e.tag ?? ""}`.replace(/ · $/, ""), say: elisionSay(word, rest) };
       }
       const b = blendLines(row.stimulus);
-      return { ...base, ...b, tag: `Blend${b.tag ? ` · ${b.tag}` : ""}` };
+      return { ...base, ...b, tag: `Blend${b.tag ? ` · ${b.tag}` : ""}`, say: blendSay(row.stimulus) };
     }
     case "digits": {
       const digits = row.stimulus.split("-");
@@ -259,6 +265,8 @@ function prepare(kind: SubtestId, row: RawRow): TrialItem {
         ...base,
         lines: [`Read steadily, one digit per second:`, digits.join("   ")],
         digits,
+        say: digitsSay(digits),
+        noReplay: true,
         answer: digits.join(" – "),
         tag: `span ${row.span}`,
       };
@@ -267,7 +275,8 @@ function prepare(kind: SubtestId, row: RawRow): TrialItem {
       return {
         ...base,
         lines: ["Say it once, clearly:", row.stimulus],
-        speak: row.stimulus,
+        say: nonwordRepSay(row.stimulus),
+        noReplay: true,
         answer: row.stimulus,
         tag: `${row.syllables} syllable${row.syllables === 1 ? "" : "s"}`,
       };
