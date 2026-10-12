@@ -91,7 +91,7 @@ instant. Only short item text is sent to the provider; no names or scores. The e
 caps text length and rate-limits per client, but anyone who can load the site can trigger voice generation, so keep Vercel
 Deployment Protection on, or set a spend limit with your provider.
 
-**Kokoro.** Run `ghcr.io/eduardolat/kokoro-web:latest` on any Docker host (it cannot run on Vercel itself), for example
+**Kokoro.** Step-by-step hosting options (Railway, a VPS, or Kokoro Web) are in [docs/hosting-kokoro.md](docs/hosting-kokoro.md). In short: run `ghcr.io/eduardolat/kokoro-web:latest` on any Docker host (it cannot run on Vercel itself), for example
 `docker run -p 3000:3000 -e KW_SECRET_API_KEY=... -v ./kokoro-cache:/kokoro/cache ghcr.io/eduardolat/kokoro-web:latest`,
 then set `KOKORO_BASE_URL=https://<your-host>/api/v1` and `KOKORO_API_KEY` on Vercel (`npx vercel env add ... production`) and redeploy.
 Natural voices come from the 82M Kokoro model; there is no per-request cost beyond the host.
