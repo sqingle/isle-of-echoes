@@ -4,7 +4,10 @@
  * directly, so they are instant and need no voice server. Item words are still generated on demand.
  *
  *   KOKORO_BASE_URL=https://host/v1 KOKORO_API_KEY=... KOKORO_MODEL=kokoro npx tsx scripts/pregen-narration.ts
- *   add --dry to only list what would be generated
+ *   add --dry to only list what would be generated, --force to re-render clips that already exist
+ *
+ * The Kokoro server is NOT safe under concurrent requests (parallel renders come back truncated or garbled),
+ * so clips are rendered strictly one at a time and each one is length-checked.
  */
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -14,6 +17,7 @@ import * as N from "../src/lib/narration";
 import { synthesize } from "../src/lib/tts";
 import type { Segment } from "../src/lib/speech";
 
+const FORCE = process.argv.includes("--force");
 const OUT = "public/narration";
 const MANIFEST = "src/data/narrationManifest.json";
 
@@ -51,12 +55,19 @@ async function worker() {
     const [k, { text, rate }] = entry;
     const file = `${createHash("sha1").update(k).digest("hex").slice(0, 12)}.mp3`;
     manifest[k] = file;
-    if (!existsSync(`${OUT}/${file}`)) {
+    if (FORCE || !existsSync(`${OUT}/${file}`)) {
       let ok = false;
-      for (let attempt = 0; attempt < 4 && !ok; attempt++) {
+      for (let attempt = 0; attempt < 5 && !ok; attempt++) {
         const r = await synthesize(text, rate ? Math.round(rate * 10) / 10 : null).catch(() => null);
         if (r?.ok) {
-          await writeFile(`${OUT}/${file}`, Buffer.from(await r.arrayBuffer()));
+          const buf = Buffer.from(await r.arrayBuffer());
+          // 32 kbps mono mp3: a healthy sentence runs about 0.07 s per character; truncated renders are far shorter
+          const secPerChar = (buf.length * 8) / 32000 / text.length;
+          if (text.length >= 30 && (secPerChar < 0.055 || secPerChar > 0.1)) {
+            console.warn(`  suspicious length (${secPerChar.toFixed(3)} s/char), retrying: ${text.slice(0, 40)}`);
+            continue;
+          }
+          await writeFile(`${OUT}/${file}`, buf);
           ok = true;
         } else await new Promise((res) => setTimeout(res, 3000));
       }
@@ -68,7 +79,7 @@ async function worker() {
 async function main() {
   if (process.argv.includes("--dry")) return;
   await mkdir(OUT, { recursive: true });
-  await Promise.all([worker(), worker(), worker()]);
+  await worker();
 
   const sorted = Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
   await writeFile(MANIFEST, JSON.stringify(sorted, null, 1) + "\n");
