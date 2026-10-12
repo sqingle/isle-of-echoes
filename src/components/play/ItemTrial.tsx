@@ -17,8 +17,11 @@ import {
   type Tier,
   type TrialItem,
 } from "@/lib/game";
-import { canSpeak, speak, speakDigits, stopSpeech } from "@/lib/speech";
-import { Lantern, Rings, RealmHeader, type LanternState } from "./parts";
+import { Archivist } from "@/components/Archivist";
+import { leadIn, realmDone, realmIntro, stepBack } from "@/lib/narration";
+import { preloadSegments, stopSpeech, type Segment } from "@/lib/speech";
+import { useCanSpeak, useNarrate } from "@/lib/useNarrate";
+import { Lantern, RealmHeader, type LanternState } from "./parts";
 
 type Phase = "intro" | "play" | "basal" | "done";
 
@@ -93,12 +96,28 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
   const [basalSeen, setBasalSeen] = useState(false);
   const [marks, setMarks] = useState<boolean[]>([]);
   const [outcome, setOutcome] = useState<{ discontinued: boolean; belowFloor: boolean }>({ discontinued: false, belowFloor: false });
-  const [hearing, setHearing] = useState(false);
-  const [lit, setLit] = useState(-1);
 
   const item: TrialItem | undefined = items[index];
-  const hasVoice = settings.voice && canSpeak();
+  const canSpeakNow = useCanSpeak();
+  const voiceOn = settings.voice && canSpeakNow;
   const basalN = Math.min(3, location.ceiling);
+
+  const rawNow = responses.reduce((a, r) => a + r.score, 0);
+  const segments: Segment[] | null =
+    phase === "intro"
+      ? realmIntro(subtest, location.name, location.blurb, settings.tier === 0)
+      : phase === "done"
+        ? realmDone(rawNow, responses.length)
+        : phase === "play" && item
+          ? [...(dropped && index === 0 ? stepBack : []), ...leadIn(index, items.length), ...item.say]
+          : null;
+  const { speaking, mark, replay } = useNarrate(segments, voiceOn && segments !== null, `${phase}:${item?.key ?? ""}`, phase === "play" && item ? item.say : null);
+
+  /* have the next item's voice ready before it is needed */
+  const nextItem = items[index + 1];
+  useEffect(() => {
+    if (voiceOn && nextItem) preloadSegments(nextItem.say);
+  }, [voiceOn, nextItem]);
 
   useEffect(() => () => stopSpeech(), []);
 
@@ -149,8 +168,6 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
     (v: number) => {
       if (!item || phase !== "play") return;
       stopSpeech();
-      setHearing(false);
-      setLit(-1);
       const next = [...responses, { key: item.key, item: item.item, score: v }];
       setResponses(next);
       setMarks([]);
@@ -165,15 +182,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
     [item, phase, responses, basalSeen, basalN, advance],
   );
 
-  const hear = useCallback(async () => {
-    if (!item || !hasVoice) return;
-    setHearing(true);
-    if (item.digits) await speakDigits(item.digits, setLit);
-    else if (item.speak) await speak(item.speak, item.kind === "nonwordRep" ? 0.7 : 0.82);
-    setHearing(false);
-  }, [item, hasVoice]);
-
-  /* keyboard: C = true echo, X = not yet, H = hear it */
+  /* keyboard: C = true echo, X = not yet, H = hear it again */
   useEffect(() => {
     if (phase !== "play" || !item || item.kind === "segmentation") return;
     const onKey = (e: KeyboardEvent) => {
@@ -181,11 +190,11 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       const k = e.key.toLowerCase();
       if (k === "c") score(1);
       else if (k === "x") score(0);
-      else if (k === "h") void hear();
+      else if (k === "h" && !item.noReplay) replay();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, item, score, hear]);
+  }, [phase, item, score, replay]);
 
   const isDone = (id: string) => (id === "rapid" ? Object.keys(rapid).length > 0 : !!subtests[id as SubtestId]);
   const nextRealm = LOCATIONS.find((l) => l.id !== subtest && !isDone(l.id));
@@ -199,8 +208,13 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 py-8">
         <RealmHeader location={location} tier={tier} />
         <div className="plaque rise mt-6 p-6 md:p-9">
-          <p className="eyebrow">{location.battery}</p>
-          <p className="mt-2 text-2xl text-bone italic md:text-3xl">{location.blurb}</p>
+          <div className="flex flex-wrap items-center gap-5">
+            <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
+            <div className="min-w-0 flex-1">
+              <p className="eyebrow">{location.battery}</p>
+              <p className="mt-2 text-2xl text-bone italic md:text-3xl">{location.blurb}</p>
+            </div>
+          </div>
           <dl className="mt-6 grid gap-5 text-lg md:grid-cols-2">
             <div>
               <dt className="eyebrow">How the Keeper plays</dt>
@@ -307,6 +321,9 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 py-8">
         <RealmHeader location={location} tier={tier} />
         <div className="plaque rise mt-6 p-7 md:p-10 text-center">
+          <div className="mb-3 flex justify-center">
+            <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
+          </div>
           <p className="eyebrow">The realm falls quiet</p>
           <p className="title-wash mt-3 text-6xl md:text-7xl">
             {fmtScore(raw)}
@@ -376,7 +393,8 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       </div>
 
       <section className="plaque rise mt-3 flex-1 p-5 text-center md:p-8" key={item.key} aria-live="polite">
-        <Rings active={hearing} />
+        <Archivist speaking={speaking} onReplay={voiceOn && !item.noReplay ? replay : undefined} />
+        {item.noReplay && <p className="text-sm text-stone italic">Said once only</p>}
         {item.tag && <p className="eyebrow mt-4">{item.tag}</p>}
         <div className="mt-4 space-y-3">
           {item.lines.map((line, i) => (
@@ -394,7 +412,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
             >
               {item.kind === "digits" && i === big
                 ? item.digits!.map((d, di) => (
-                    <span key={di} className={lit === di ? "text-white drop-shadow-[0_0_14px_rgba(255,224,140,0.9)]" : ""}>
+                    <span key={di} className={mark === di ? "text-white drop-shadow-[0_0_14px_rgba(255,224,140,0.9)]" : ""}>
                       {d}
                       {di < item.digits!.length - 1 ? " " : ""}
                     </span>
@@ -403,15 +421,6 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
             </p>
           ))}
         </div>
-
-        {hasVoice && (item.speak || item.digits) && (
-          <div className="mt-6">
-            <button className="btn btn-stone" onClick={() => void hear()} disabled={hearing}>
-              {hearing ? "The island speaks…" : item.digits ? "Hear the digits (1 / sec)" : "Hear it"}
-              <kbd className="rounded border border-white/20 px-1.5 text-[0.7rem] tracking-normal normal-case">H</kbd>
-            </button>
-          </div>
-        )}
 
         {seg && (
           <div className="mt-7">

@@ -17,6 +17,9 @@ import {
   type RapidId,
   type SubtestId,
 } from "@/lib/game";
+import { Archivist } from "@/components/Archivist";
+import { rapidChoose, rapidDone, rapidGo, rapidIntro } from "@/lib/narration";
+import { useCanSpeak, useNarrate } from "@/lib/useNarrate";
 import { RealmHeader } from "./parts";
 
 type Phase = "choose" | "practice" | "ready" | "timing" | "mark" | "done";
@@ -152,6 +155,19 @@ export function RapidTrial({ location }: { location: Location }) {
   const order: RapidId[] = tier === 0 ? ["color", "shape", "digit", "letter"] : ["digit", "letter", "color", "shape"];
 
   const noun = meta.noun;
+  const canSpeakNow = useCanSpeak();
+  const voiceOn = settings.voice && canSpeakNow;
+  const segments =
+    phase === "practice"
+      ? rapidIntro(noun, true)
+      : phase === "ready"
+        ? rapidGo
+        : phase === "done"
+          ? rapidDone
+          : phase === "choose"
+            ? rapidChoose
+            : null;
+  const { speaking, replay } = useNarrate(segments, voiceOn && segments !== null, `${phase}:${task}`);
   const intro = `“Name every ${noun} on the wall, left to right, then the next row down, as fast as you can. Don’t skip any.”`;
 
   return (
@@ -240,6 +256,9 @@ export function RapidTrial({ location }: { location: Location }) {
 
       {phase === "practice" && (
         <div className="plaque rise mt-3 p-6 text-center md:p-9">
+          <div className="mb-3 flex justify-center">
+            <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
+          </div>
           <p className="eyebrow">Practice row</p>
           <p className="mx-auto mt-2 max-w-xl text-xl text-parchment/90 italic">{intro}</p>
           <div className="mx-auto mt-5 max-w-md">

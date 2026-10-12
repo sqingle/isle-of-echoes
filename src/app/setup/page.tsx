@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { SceneBackdrop } from "@/components/SceneBackdrop";
 import { useSession } from "@/components/SessionProvider";
 import { TIERS, type Tier } from "@/lib/game";
@@ -32,6 +32,14 @@ export default function Setup() {
   const [showKey, setShowKey] = useState(settings.showKey);
   const [voice, setVoice] = useState(settings.voice);
   const [traveler, setTraveler] = useState(settings.traveler);
+  const [natural, setNatural] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch("/api/narrate/status")
+      .then((r) => r.json())
+      .then((j: { provider: string | null }) => setNatural(!!j.provider))
+      .catch(() => setNatural(false));
+  }, []);
   const voiceOk = useSyncExternalStore(
     () => () => {},
     canSpeak,
@@ -112,10 +120,12 @@ export default function Setup() {
             <Toggle
               checked={voice && voiceOk}
               onChange={setVoice}
-              label="Offer the island’s voice"
+              label="The Archivist’s voice"
               hint={
                 voiceOk
-                  ? "Adds a “Hear it” button for real words, digit strings and nonwords. Your device’s voice may blur nonwords, so the Keeper’s own voice is always best."
+                  ? natural === false
+                    ? "The Archivist greets the child, explains each game and reads every item aloud. The natural voice is not set up on this site yet, so your device’s voice will be used."
+                    : "The Archivist greets the child, explains each game and reads every item aloud, so the child never needs to read."
                   : "Speech is not available in this browser. The Keeper reads every item aloud."
               }
             />
