@@ -1,5 +1,11 @@
 /** Browser speech synthesis, wrapped so that a whole script (words, pauses, digit cadence) plays as one cancellable unit. */
 
+import manifestJson from "@/data/narrationManifest.json";
+
+/** pre-rendered fixed lines, keyed "rate|text" → file in /narration */
+const MANIFEST = manifestJson as Record<string, string>;
+const staticKey = (text: string, rate?: number) => `${rate ?? ""}|${text}`;
+
 export interface Segment {
   /** words to speak */
   text?: string;
@@ -52,6 +58,17 @@ function clip(text: string, rate?: number): Promise<string | null> {
   const key = `${rate ?? ""}|${text}`;
   let c = clips.get(key);
   if (!c) {
+    const file = MANIFEST[staticKey(text, rate)];
+    if (file) {
+      c = fetch(`/narration/${file}`)
+        .then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null))
+        .catch(() => null);
+      clips.set(key, c);
+      void c.then((u) => {
+        if (!u) clips.delete(key);
+      });
+      return c;
+    }
     const q = new URLSearchParams({ t: text });
     if (rate) q.set("r", String(Math.round(rate * 10) / 10));
     c = fetch(`/api/narrate?${q}`)
@@ -72,8 +89,8 @@ function clip(text: string, rate?: number): Promise<string | null> {
 
 /** warm the cache for a script that is about to be needed */
 export function preloadSegments(segments: Segment[]) {
-  if (neural !== true || typeof window === "undefined") return;
-  for (const s of segments) if (s.text) void clip(s.text, s.rate);
+  if (typeof window === "undefined") return;
+  for (const s of segments) if (s.text && (neural === true || MANIFEST[staticKey(s.text, s.rate)])) void clip(s.text, s.rate);
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -131,9 +148,11 @@ export function playSegments(segments: Segment[], cb: Callbacks = {}, baseRate =
 
     // natural voice: fetch every clip first so playback has no gaps; any miss falls back to the device voice
     let urls: (string | null)[] | null = null;
-    if (neural === null) await probeVoice();
+    if (neural === null && segments.some((s) => s.text && !MANIFEST[staticKey(s.text, s.rate)])) await probeVoice();
     if (id !== current) return;
-    if (neural !== false) {
+    // a script plays in the natural voice only if every line has a clip (pre-rendered, or from the voice server)
+    const available = (s: Segment) => !s.text || !!MANIFEST[staticKey(s.text, s.rate)] || neural === true;
+    if (segments.every(available)) {
       const got = await Promise.all(segments.map((s) => (s.text ? clip(s.text, s.rate) : Promise.resolve(""))));
       if (id !== current) return;
       if (got.every((u) => u !== null)) urls = got;

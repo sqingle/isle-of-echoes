@@ -18,7 +18,7 @@ import {
   type SubtestId,
 } from "@/lib/game";
 import { Archivist } from "@/components/Archivist";
-import { rapidDone, rapidGo, rapidIntro } from "@/lib/narration";
+import { rapidChoose, rapidDone, rapidGo, rapidIntro } from "@/lib/narration";
 import { useCanSpeak, useNarrate } from "@/lib/useNarrate";
 import { RealmHeader } from "./parts";
 
@@ -165,7 +165,7 @@ export function RapidTrial({ location }: { location: Location }) {
         : phase === "done"
           ? rapidDone
           : phase === "choose"
-            ? [{ text: "These are the four walls of glyphs. Your Keeper will choose which one we name first." }]
+            ? rapidChoose
             : null;
   const { speaking, replay } = useNarrate(segments, voiceOn && segments !== null, `${phase}:${task}`);
   const intro = `“Name every ${noun} on the wall, left to right, then the next row down, as fast as you can. Don’t skip any.”`;

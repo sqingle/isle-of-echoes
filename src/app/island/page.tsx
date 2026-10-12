@@ -7,7 +7,7 @@ import { IslandMap } from "@/components/IslandMap";
 import { SceneBackdrop } from "@/components/SceneBackdrop";
 import { useSession } from "@/components/SessionProvider";
 import { Archivist } from "@/components/Archivist";
-import { ISLAND } from "@/lib/narration";
+import { ISLAND, selectLine } from "@/lib/narration";
 import { useCanSpeak, useNarrate } from "@/lib/useNarrate";
 import { LOCATIONS, LOCATION_BY_ID, RAPID_TASKS, TIERS, type LocationId } from "@/lib/game";
 
@@ -30,7 +30,7 @@ export default function Island() {
   const canSpeakNow = useCanSpeak();
   const voiceOn = settings.voice && canSpeakNow && configured;
   const { speaking, replay } = useNarrate(
-    sel ? [{ text: `This is ${sel.name}.`, pause: 300 }, { text: sel.blurb }, { text: "Tap the golden button, and we will go in." }] : ISLAND,
+    sel ? selectLine(sel.name, sel.blurb) : ISLAND,
     voiceOn,
     sel?.id ?? "island",
   );

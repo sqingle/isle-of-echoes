@@ -96,5 +96,17 @@ Deployment Protection on, or set a spend limit with your provider.
 then set `KOKORO_BASE_URL=https://<your-host>/api/v1` and `KOKORO_API_KEY` on Vercel (`npx vercel env add ... production`) and redeploy.
 Natural voices come from the 82M Kokoro model; there is no per-request cost beyond the host.
 
+**Pre-rendered lines.** Every fixed line (greeting, realm rules, lead-ins, digits, sounds; 125 clips, 1.5 MB) is committed
+as static audio in `public/narration/`, indexed by `src/data/narrationManifest.json`, so it plays instantly and works even
+with no voice server. Only the item words are generated on demand. After editing any line in `src/lib/narration.ts`, or
+changing the voice, regenerate with:
+
+```bash
+KOKORO_BASE_URL=https://<host>/v1 KOKORO_API_KEY=... KOKORO_MODEL=kokoro KOKORO_VOICE=bm_fable \
+  npx tsx scripts/pregen-narration.ts      # add --dry to list clips only; existing files are kept
+```
+
+Delete `public/narration/` first if you change the voice, so every clip is re-rendered.
+
 Phoneme strings (for example `/s/-/i/-/t/`) are respelled for speech and are approximate. The Keeper’s own voice remains the
 gold standard for clinical use.

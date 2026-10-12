@@ -5,7 +5,7 @@ import type { Segment } from "./speech";
 /* respelled the way a teacher would voice it. Approximate by nature.  */
 /* ------------------------------------------------------------------ */
 
-const SOUND: Record<string, string> = {
+export const SOUND: Record<string, string> = {
   p: "puh", b: "buh", t: "tuh", d: "duh", k: "kuh", g: "guh",
   s: "sss", z: "zzz", f: "fff", v: "vvv", m: "mmm", n: "nnn", l: "lll", r: "rrr",
   h: "huh", w: "wuh", y: "yuh", j: "juh", ch: "chuh", sh: "shh", th: "thh", ng: "ing", zh: "zhh", x: "ks", q: "kwuh",
@@ -170,3 +170,12 @@ export const rapidIntro = (noun: string, practice: boolean): Segment[] => [
 
 export const rapidGo: Segment[] = [{ text: "Here is the whole wall. Begin when you are ready.", pause: 300 }];
 export const rapidDone: Segment[] = [{ text: "Well done. You named them all." }];
+
+export const rapidChoose: Segment[] = [{ text: "These are the four walls of glyphs. Your Keeper will choose which one we name first." }];
+
+/** spoken when a realm is picked on the island map */
+export const selectLine = (name: string, blurb: string): Segment[] => [
+  { text: `This is ${name}.`, pause: 300 },
+  { text: blurb },
+  { text: "Tap the golden button, and we will go in." },
+];
