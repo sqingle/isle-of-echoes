@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { KeeperLetter } from "@/components/KeeperLetter";
 import { SceneBackdrop } from "@/components/SceneBackdrop";
 import { useSession } from "@/components/SessionProvider";
 import { LOCATIONS, RAPID_TASKS, TIERS, fmtScore, fmtSeconds, rawScore, type Battery, type SubtestId } from "@/lib/game";
@@ -196,6 +197,7 @@ export default function Ledger() {
                   </tbody>
                 </table>,
               )}
+              <KeeperLetter />
             </>
           )}
 
