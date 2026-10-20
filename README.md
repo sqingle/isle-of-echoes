@@ -30,8 +30,11 @@ Rules taken from the Administration & Scoring Guide:
 - **Rapid naming:** one complete 9-column grid per wall (Forms A–E), practice row first, stopwatch, tap tiles for errors
   (once = error, twice = self-corrected). At Tier 0 Digit/Letter are gated on the practice row.
 - **Ledger:** per-battery tables, print view and CSV export. No composite is computed.
+- **The Keeper’s Letter:** an optional button on the ledger asks Claude to turn the tables into plain-language cards for the
+  adult (see below).
 
-All data lives in memory for the length of the tab. Nothing is stored or sent anywhere.
+All data lives in memory for the length of the tab. Nothing is stored, and nothing is sent anywhere unless the Keeper asks for
+a letter, which sends the scores only.
 
 ## Run it
 
@@ -49,7 +52,7 @@ import the GitHub repo and deploy.
 
 ```
 src/
-  app/                  / (title) · /setup · /island · /play/[id] · /ledger
+  app/                  / (title) · /setup · /island · /play/[id] · /ledger · api/letter, api/narrate
   components/
     art.tsx             SVG scenery (columns, gears, dome, library, rocket, tower, forest, sea, sky)
     IslandMap.tsx       the interactive island, built from the same pieces
@@ -69,6 +72,22 @@ src/
 Weathered sandstone columns, rusted iron gears, moss on basalt, hazy gold light over a deep sea-and-sky blue, with a
 MYST-style amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. Every scene is drawn in code
 as SVG; no third-party artwork is included.
+
+## The Keeper’s Letter
+
+The ledger’s score tables are accurate but hard to read without a special-education background. **Write the Keeper’s Letter**
+sends the session’s scores to `/api/letter`, which asks Claude to fill a `save_letter` tool, and the page renders the reply as
+four cards: *What we noticed* (one entry per battery, never combined), *Strengths*, *Try at home this week* (three to five
+short games tied to the harder subtests) and *When to talk to a professional* (the model’s sentence plus fixed wording and the
+non-normed disclaimer). The letter prints with the ledger.
+
+- **Privacy.** Only scores, tiers and the age band are sent. The server rebuilds the request from known fields, so no free text
+  (and never the traveler’s name) can reach the model; the page adds the name back when it shows the letter.
+- **Guardrails** live in the system prompt in `src/lib/ai/letter.ts`: never conclude or mention dyslexia or a diagnosis, never
+  sum or rank the batteries, no norms or grade comparisons, about a 6th-grade reading level. A letter that slips on the banned
+  words is regenerated.
+- **Setup.** Set `ANTHROPIC_API_KEY` (and optionally `ANTHROPIC_MODEL`, default `claude-opus-5-5`) in Vercel’s environment
+  variables and redeploy. The route accepts same-origin requests only and allows six letters a minute per client.
 
 ## The Archivist (narration)
 
