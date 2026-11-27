@@ -91,13 +91,13 @@ export const nonwordRepSay = (word: string): Segment[] => [
 /* ------------------------------------------------------------------ */
 
 export const STORY: Segment[] = [
-  { text: "Greetings, traveler. I am the Archivist, keeper of every echo on this island.", pause: 600 },
+  { text: "Greetings, traveler. I am the Archivist, keeper of every echo in this valley.", pause: 600 },
   { text: "Eight places wait for us. In each one, we will play a listening game with sounds, words and numbers.", pause: 600 },
   { text: "You will not need to read a single thing. Just listen to me, and say what you hear. I will guide you the whole way." },
 ];
 
 export const ISLAND: Segment[] = [
-  { text: "Here is the island. Each glowing lantern is a place we can visit.", pause: 500 },
+  { text: "Here is the valley. Each glowing lantern is a place we can visit.", pause: 500 },
   { text: "Tap a lantern, and I will walk with you there." },
 ];
 
@@ -113,7 +113,7 @@ const RULES: Record<string, string[]> = {
   ],
   segmentation: [
     "In this game, I will say a word. Then you break it apart for me.",
-    "Say each little sound, one at a time, like turning gears. Take your time.",
+    "Say each little sound, one at a time, like the sails of a windmill, one turn at a time. Take your time.",
   ],
   isolation: [
     "In this game, I will ask about one sound inside a word. It might be the first sound, the last sound, or one in the middle.",
@@ -171,9 +171,9 @@ export const rapidIntro = (noun: string, practice: boolean): Segment[] => [
 export const rapidGo: Segment[] = [{ text: "Here is the whole wall. Begin when you are ready.", pause: 300 }];
 export const rapidDone: Segment[] = [{ text: "Well done. You named them all." }];
 
-export const rapidChoose: Segment[] = [{ text: "These are the four walls of glyphs. Your Keeper will choose which one we name first." }];
+export const rapidChoose: Segment[] = [{ text: "These are the four walls of pictures and signs. Your Keeper will choose which one we name first." }];
 
-/** spoken when a realm is picked on the island map */
+/** spoken when a realm is picked on the valley map */
 export const selectLine = (name: string, blurb: string): Segment[] => [
   { text: `This is ${name}.`, pause: 300 },
   { text: blurb },

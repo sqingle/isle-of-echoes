@@ -5,9 +5,9 @@ import { TIERS, type Location, type Tier } from "@/lib/game";
 export function RealmHeader({ location, tier, right }: { location: Location; tier: Tier; right?: ReactNode }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-3">
-      <div className="rounded bg-abyss/55 px-4 py-2 backdrop-blur-sm">
+      <div className="veil px-4 py-2">
         <Link href="/island" className="eyebrow hover:text-gold">
-          ← The island
+          ← The valley
         </Link>
         <h1 className="engraved mt-1 text-2xl text-bone drop-shadow md:text-3xl">{location.name}</h1>
         <p className="font-display text-xs tracking-[0.24em] text-sandstone uppercase">

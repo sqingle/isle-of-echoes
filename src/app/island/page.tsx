@@ -42,7 +42,7 @@ export default function Island() {
       <header className="mx-auto flex max-w-[1400px] flex-wrap items-end justify-between gap-4">
         <div>
           <Link href="/" className="eyebrow hover:text-gold">
-            The Isle of Echoes
+            Valley of Echoes
           </Link>
           <h1 className="engraved mt-1 text-2xl text-bone md:text-3xl">Choose a realm</h1>
         </div>
@@ -65,14 +65,14 @@ export default function Island() {
 
       <div className="mx-auto mt-4 max-w-[1400px]">
         <div className="plaque overflow-hidden !p-0">
-          <div className="grain relative aspect-[1200/720] w-full">
+          <div className="grain relative aspect-video w-full">
             <IslandMap selected={selected} done={done} onSelect={setSelected} />
             <div className="vignette pointer-events-none absolute inset-0" />
           </div>
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <section className="plaque flex min-h-[10.5rem] items-center gap-5 p-6" aria-live="polite">
+          <section className="plaque flex min-h-[10.5rem] flex-wrap items-center justify-center gap-5 p-6 sm:flex-nowrap" aria-live="polite">
             <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
             <div className="min-w-0 flex-1">
             {sel ? (
@@ -93,7 +93,7 @@ export default function Island() {
               </div>
             ) : (
               <div>
-                <p className="eyebrow">The island waits</p>
+                <p className="eyebrow">The valley waits</p>
                 <p className="mt-2 text-lg text-parchment/85 italic">
                   Touch a glowing lantern on the map, or pick a realm from the list. Realms can be visited in any order, and the Keeper may
                   split the journey across two sittings.

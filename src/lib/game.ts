@@ -37,7 +37,7 @@ export interface Location {
   blurb: string;
   /** consecutive failures that end the subtest (guide: 5 for PA / RN, 2 for memory) */
   ceiling: number;
-  /** anchor on the island map (1200 × 720 viewBox) */
+  /** anchor on the valley map (1280 × 720 viewBox, matches public/art/valley-map.jpg) */
   anchor: { x: number; y: number };
   labelSide?: "left" | "right";
 }
@@ -45,40 +45,39 @@ export interface Location {
 export const LOCATIONS: Location[] = [
   {
     id: "elision",
-    name: "The Whispering Colonnade",
+    name: "The Whispering Chimes",
     subtest: "Elision",
     battery: "Phonological Awareness",
-    blurb: "Speak a word, then let one sound slip away between the columns.",
+    blurb: "Speak a word, then let one sound slip away among the chimes.",
     ceiling: 5,
-    anchor: { x: 420, y: 372 },
+    anchor: { x: 250, y: 215 },
   },
   {
     id: "blending",
     name: "Weaver’s Landing",
     subtest: "Blending",
     battery: "Phonological Awareness",
-    blurb: "Gather scattered sounds at the dock and weave them into a word.",
+    blurb: "Gather scattered sounds at the landing and weave them into a word.",
     ceiling: 5,
-    anchor: { x: 700, y: 596 },
+    anchor: { x: 938, y: 500 },
   },
   {
     id: "segmentation",
-    name: "The Cogworks",
+    name: "The Patchwork Windmill",
     subtest: "Segmentation",
     battery: "Phonological Awareness",
-    blurb: "Turn a word over, gear by gear, until every sound is its own cog.",
+    blurb: "Turn a word over, sail by sail, until every sound stands alone.",
     ceiling: 5,
-    anchor: { x: 972, y: 392 },
-    labelSide: "left",
+    anchor: { x: 646, y: 150 },
   },
   {
     id: "isolation",
-    name: "The Dome Observatory",
+    name: "The Stargazer’s Nest",
     subtest: "Phoneme Isolation",
     battery: "Phonological Awareness",
-    blurb: "Look through the lens and find the first, last or hidden sound.",
+    blurb: "Peer into the crystal and find the first, last or hidden sound.",
     ceiling: 5,
-    anchor: { x: 706, y: 388 },
+    anchor: { x: 906, y: 210 },
   },
   {
     id: "nonwordEB",
@@ -87,36 +86,35 @@ export const LOCATIONS: Location[] = [
     battery: "Phonological Awareness",
     blurb: "Strange words from distant shores, with no meaning to lean on.",
     ceiling: 5,
-    anchor: { x: 664, y: 214 },
+    anchor: { x: 488, y: 180 },
   },
   {
     id: "digits",
-    name: "The Numbered Library",
+    name: "The Hollow Library",
     subtest: "Memory for Digits",
     battery: "Phonological Memory",
     blurb: "Hold a string of numbers in the mind and give it back in order.",
     ceiling: 2,
-    anchor: { x: 598, y: 322 },
-    labelSide: "left",
+    anchor: { x: 450, y: 335 },
   },
   {
     id: "nonwordRep",
     name: "Echo Peak",
     subtest: "Nonword Repetition",
     battery: "Phonological Memory",
-    blurb: "Call a made-up word into the canyon and hear it return unchanged.",
+    blurb: "Call a made-up word to the mountain and hear it return unchanged.",
     ceiling: 2,
-    anchor: { x: 870, y: 214 },
+    anchor: { x: 962, y: 112 },
   },
   {
     id: "rapid",
-    name: "The Tilted Tower",
+    name: "The Lantern Treehouse",
     subtest: "Rapid Naming",
     battery: "Rapid Naming",
-    blurb: "Name every glyph on the wall, quickly, without losing your place.",
+    blurb: "Name everything on the treehouse wall, quickly, without losing your place.",
     ceiling: 5,
-    anchor: { x: 128, y: 560 },
-    labelSide: "right",
+    anchor: { x: 1178, y: 170 },
+    labelSide: "left",
   },
 ];
 

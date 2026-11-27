@@ -40,7 +40,7 @@ export default function Ledger() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "isle-of-echoes-ledger.csv";
+    a.download = "valley-of-echoes-ledger.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -114,7 +114,7 @@ export default function Ledger() {
       <div className="mx-auto max-w-4xl">
         <div className="no-print flex flex-wrap items-center justify-between gap-3">
           <Link href="/island" className="eyebrow hover:text-gold">
-            ← The island
+            ← The valley
           </Link>
           <div className="flex flex-wrap gap-3">
             <button className="btn btn-stone !min-h-10 !px-4 !py-2" onClick={() => window.print()} disabled={!anything}>
@@ -139,7 +139,7 @@ export default function Ledger() {
 
         <article className="plaque print-sheet rise mt-4 p-6 md:p-10">
           <p className="eyebrow">The Keeper’s ledger</p>
-          <h1 className="engraved mt-2 text-3xl text-bone md:text-4xl">Isle of Echoes · results</h1>
+          <h1 className="engraved mt-2 text-3xl text-bone md:text-4xl">Valley of Echoes · results</h1>
           <p className="mt-2 text-lg text-parchment/80">
             {settings.traveler ? `Traveler ${settings.traveler} · ` : ""}Started at Tier {tier.id} (ages {tier.ages}) ·{" "}
             <time suppressHydrationWarning>{new Date().toLocaleDateString(undefined, { dateStyle: "long" })}</time>
@@ -151,7 +151,7 @@ export default function Ledger() {
           </p>
 
           {!anything ? (
-            <p className="mt-8 text-xl text-parchment/80 italic">No realm has been visited yet. Return to the island and begin anywhere.</p>
+            <p className="mt-8 text-xl text-parchment/80 italic">No realm has been visited yet. Return to the valley and begin anywhere.</p>
           ) : (
             <>
               {section("Phonological Awareness", subtestTable(PA))}

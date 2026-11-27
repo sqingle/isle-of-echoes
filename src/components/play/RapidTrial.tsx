@@ -175,8 +175,8 @@ export function RapidTrial({ location }: { location: Location }) {
       <RealmHeader location={location} tier={tier} />
 
       {phase === "choose" && (
-        <div className="plaque rise mt-5 p-6 md:p-9">
-          <p className="eyebrow">Four glyph walls</p>
+        <div className="veil rise mt-5 p-6 md:p-9">
+          <p className="eyebrow">Four picture walls</p>
           <p className="mt-2 text-xl text-parchment/90 italic">
             Each wall is one complete grid, read in full, never sampled. Time and errors are recorded for each wall on its own.
           </p>
@@ -230,7 +230,7 @@ export function RapidTrial({ location }: { location: Location }) {
           </ul>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/island" className="btn btn-stone">
-              Back to the island
+              Back to the valley
             </Link>
             {Object.keys(rapid).length > 0 && (
               <Link href={nextRealm ? `/play/${nextRealm.id}` : "/ledger"} className="btn btn-brass">
@@ -242,7 +242,7 @@ export function RapidTrial({ location }: { location: Location }) {
       )}
 
       {phase !== "choose" && (
-        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 rounded bg-abyss/55 px-4 py-2 backdrop-blur-sm">
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 veil px-4 py-2">
           <h2 className="engraved text-xl text-bone">
             {meta.label} <span className="text-sandstone">· Form {usedForm}</span>
           </h2>
@@ -255,7 +255,7 @@ export function RapidTrial({ location }: { location: Location }) {
       )}
 
       {phase === "practice" && (
-        <div className="plaque rise mt-3 p-6 text-center md:p-9">
+        <div className="veil rise mt-3 p-6 text-center md:p-9">
           <div className="mb-3 flex justify-center">
             <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
           </div>

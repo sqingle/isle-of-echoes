@@ -6,8 +6,6 @@ import {
   Boat,
   Clouds,
   Cogworks,
-  Colonnade,
-  Dock,
   Dome,
   Fog,
   Forest,
@@ -92,39 +90,16 @@ function Grass({ y }: { y: number }) {
   );
 }
 
+/** realms that have a painted scene; the rest are still drawn in code */
+export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
+  elision: "/art/whispering-chimes.jpg",
+  blending: "/art/weavers-landing.jpg",
+};
+
 function Scene({ id }: { id: LocationId | "haze" }) {
+  const painting = PAINTED[id];
+  if (painting) return <image href={painting} width={W} height={H} />;
   switch (id) {
-    case "elision":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 1100, y: 190 }} />
-          <Clouds p={P} w={W} y={70} scale={1.3} seed={7} />
-          <Fog p={P} w={W} y={HZ - 90} h={160} opacity={0.8} />
-          <Forest p={P} x0={-40} x1={W + 40} y0={470} y1={640} count={120} seed={21} scale={2.4} />
-          <Grass y={650} />
-          <At x={800} y={800} s={4.6}>
-            <Colonnade p={P} />
-          </At>
-          <Fog p={P} w={W} y={500} h={200} opacity={0.35} />
-        </>
-      );
-    case "blending":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 400, y: 200 }} />
-          <Clouds p={P} w={W} y={60} scale={1.2} seed={3} />
-          <Sea p={P} w={W} y={HZ} h={H - HZ} glints={140} seed={5} />
-          <At x={1250} y={HZ + 8} s={2.2}>
-            <polygon points="-90,0 -40,-40 20,-26 80,-48 130,0" fill="#33515a" opacity="0.65" />
-          </At>
-          <At x={720} y={720} s={5.2}>
-            <Dock p={P} />
-          </At>
-          <At x={1320} y={720} s={2.4}>
-            <Lamp p={P} />
-          </At>
-        </>
-      );
     case "segmentation":
       return (
         <>
@@ -229,13 +204,15 @@ function Scene({ id }: { id: LocationId | "haze" }) {
 }
 
 export function SceneBackdrop({ scene = "haze", dim = 0.28 }: { scene?: LocationId | "haze"; dim?: number }) {
+  // painted scenes are already dim at the edges, so they get a lighter vignette
+  const painted = scene in PAINTED;
   return (
     <div aria-hidden className="grain pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-abyss">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full">
         <ArtDefs p={P} />
         <Scene id={scene} />
       </svg>
-      <div className="vignette absolute inset-0" />
+      <div className={`vignette absolute inset-0 ${painted ? "opacity-55" : ""}`} />
       <div className="absolute inset-0" style={{ background: `rgb(5 9 12 / ${dim})` }} />
     </div>
   );
