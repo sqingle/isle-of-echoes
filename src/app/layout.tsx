@@ -13,9 +13,9 @@ const cormorant = Cormorant_Garamond({
 const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: "The Isle of Echoes",
+  title: "Valley of Echoes",
   description:
-    "A Myst-inspired island adventure that delivers an informal phonological screening: awareness, memory and rapid naming for ages 4–14. Illustrative, non-normed, not diagnostic.",
+    "A forest-valley adventure that delivers an informal phonological screening: awareness, memory and rapid naming for ages 4–14. Illustrative, non-normed, not diagnostic.",
 };
 
 export const viewport: Viewport = {

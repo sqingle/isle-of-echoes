@@ -57,13 +57,13 @@ const GUIDE: Record<SubtestId, { how: string; stop: string }> = {
 };
 
 const BIG_LINE = (item: TrialItem): number =>
-  item.kind === "blending" || item.kind === "isolation"
-    ? 0
-    : item.kind === "digits" || item.kind === "nonwordRep"
-      ? 1
-      : item.kind === "nonwordEB" && item.tag?.startsWith("Blend")
-        ? 0
-        : -1;
+  item.kind === "blending" || item.kind === "isolation" || (item.kind === "nonwordEB" && item.tag?.startsWith("Blend")) ? 0 : -1;
+
+/** Memory items: reading them off the screen would replace remembering them, so the child never sees them by default. */
+const MEMORY_PROMPT: Partial<Record<SubtestId, string>> = {
+  digits: "Listen, then say the numbers back in order.",
+  nonwordRep: "Listen, then say it back.",
+};
 
 function SegGear({ label, on, onToggle, index }: { label: string; on: boolean; onToggle: () => void; index: number }) {
   return (
@@ -95,6 +95,8 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
   const [dropped, setDropped] = useState(false);
   const [basalSeen, setBasalSeen] = useState(false);
   const [marks, setMarks] = useState<boolean[]>([]);
+  /** key of the memory item the Keeper has chosen to look at; hidden again on the next item */
+  const [shownKey, setShownKey] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<{ discontinued: boolean; belowFloor: boolean }>({ discontinued: false, belowFloor: false });
 
   const item: TrialItem | undefined = items[index];
@@ -129,6 +131,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       setIndex(0);
       setResponses([]);
       setMarks([]);
+      setShownKey(null);
       setBasalSeen(false);
       setDropped(wasDropped);
       setPhase("play");
@@ -171,6 +174,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
       const next = [...responses, { key: item.key, item: item.item, score: v }];
       setResponses(next);
       setMarks([]);
+      setShownKey(null);
       // Basal rule: the first three misses send the child down a tier. Memory subtests stop after two
       // consecutive misses, so there the "first misses" test uses two.
       if (!basalSeen && next.length === basalN && next.every((r) => r.score === 0)) {
@@ -207,7 +211,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
     return (
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 py-8">
         <RealmHeader location={location} tier={tier} />
-        <div className="plaque rise mt-6 p-6 md:p-9">
+        <div className="veil rise mt-6 p-6 md:p-9">
           <div className="flex flex-wrap items-center gap-5">
             <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
             <div className="min-w-0 flex-1">
@@ -223,7 +227,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
             <div>
               <dt className="eyebrow">When the realm closes</dt>
               <dd className="mt-1 text-parchment/90">
-                {g.stop} If the first {basalN} echoes are all missed, the island offers to step back one tier
+                {g.stop} If the first {basalN} echoes are all missed, the valley offers to step back one tier
                 {settings.tier === 0 ? " (Tier 0 is the floor)" : ""}.
               </dd>
             </div>
@@ -244,7 +248,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
               Begin the {settings.itemsPerRealm} echoes
             </button>
             <Link href="/island" className="btn btn-stone">
-              Back to the island
+              Back to the valley
             </Link>
           </div>
         </div>
@@ -258,7 +262,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
   if (phase === "basal") {
     return (
       <div className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center px-4 py-8">
-        <div className="plaque rise p-7 md:p-9" role="alertdialog" aria-labelledby="basal-h">
+        <div className="veil rise p-7 md:p-9" role="alertdialog" aria-labelledby="basal-h">
           <p className="eyebrow">The mist thickens</p>
           <h2 id="basal-h" className="engraved mt-2 text-2xl text-bone">
             The first {basalN} echoes were missed
@@ -320,7 +324,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
     return (
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 py-8">
         <RealmHeader location={location} tier={tier} />
-        <div className="plaque rise mt-6 p-7 md:p-10 text-center">
+        <div className="veil rise mt-6 p-7 md:p-10 text-center">
           <div className="mb-3 flex justify-center">
             <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
           </div>
@@ -352,7 +356,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
               </Link>
             )}
             <Link href="/island" className="btn btn-stone">
-              Back to the island
+              Back to the valley
             </Link>
             <button className="btn btn-stone" onClick={() => begin(settings.tier, false)}>
               Replay
@@ -373,6 +377,8 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
     i < responses.length ? (responses[i].score === 1 ? "true" : responses[i].score > 0 ? "partial" : "miss") : i === index ? "current" : "pending",
   );
   const segMarks = seg ? item.parts!.map((_, i) => !!marks[i]) : [];
+  const memoryPrompt = MEMORY_PROMPT[item.kind];
+  const revealed = shownKey === item.key;
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-4xl flex-col px-4 py-5">
@@ -380,7 +386,7 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
         location={location}
         tier={tier}
         right={
-          <p className="plaque px-4 py-2 font-mono text-sm text-gold" aria-live="polite">
+          <p className="veil px-4 py-2 font-mono text-sm text-gold" aria-live="polite">
             Echo {index + 1} / {items.length}
           </p>
         }
@@ -392,34 +398,29 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
         ))}
       </div>
 
-      <section className="plaque rise mt-3 flex-1 p-5 text-center md:p-8" key={item.key} aria-live="polite">
+      <section className="veil rise mt-3 mb-auto p-5 text-center md:p-8" key={item.key} aria-live="polite">
         <Archivist speaking={speaking} onReplay={voiceOn && !item.noReplay ? replay : undefined} />
         {item.noReplay && <p className="text-sm text-stone italic">Said once only</p>}
         {item.tag && <p className="eyebrow mt-4">{item.tag}</p>}
         <div className="mt-4 space-y-3">
-          {item.lines.map((line, i) => (
-            <p
-              key={i}
-              className={
-                i === big
-                  ? item.kind === "digits"
-                    ? "font-mono text-4xl tracking-[0.18em] text-gold md:text-6xl"
-                    : item.kind === "isolation"
+          {memoryPrompt ? (
+            <p className="text-2xl text-bone md:text-3xl">{memoryPrompt}</p>
+          ) : (
+            item.lines.map((line, i) => (
+              <p
+                key={i}
+                className={
+                  i === big
+                    ? item.kind === "isolation"
                       ? "text-3xl text-gold italic md:text-5xl"
                       : "font-mono text-3xl tracking-[0.06em] text-gold md:text-5xl"
-                  : "text-2xl text-bone md:text-3xl"
-              }
-            >
-              {item.kind === "digits" && i === big
-                ? item.digits!.map((d, di) => (
-                    <span key={di} className={mark === di ? "text-white drop-shadow-[0_0_14px_rgba(255,224,140,0.9)]" : ""}>
-                      {d}
-                      {di < item.digits!.length - 1 ? " " : ""}
-                    </span>
-                  ))
-                : line}
-            </p>
-          ))}
+                    : "text-2xl text-bone md:text-3xl"
+                }
+              >
+                {line}
+              </p>
+            ))
+          )}
         </div>
 
         {seg && (
@@ -448,11 +449,34 @@ export function ItemTrial({ location, subtest }: { location: Location; subtest: 
         )}
       </section>
 
-      <section className="plaque sticky bottom-3 z-20 mt-3 p-5" aria-label="Keeper’s panel">
+      <section className="veil sticky bottom-3 z-20 mt-6 p-5" aria-label="Keeper’s panel">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="eyebrow">Keeper’s panel</p>
-            {settings.showKey && !seg ? (
+            {memoryPrompt ? (
+              <div className="mt-1">
+                <button
+                  type="button"
+                  aria-expanded={revealed}
+                  onClick={() => setShownKey(revealed ? null : item.key)}
+                  className="cursor-pointer text-base text-sandstone underline underline-offset-4 hover:text-gold"
+                >
+                  {revealed ? "Hide item" : "Show item (turn the screen from the child)"}
+                </button>
+                {revealed && (
+                  <p className="mt-1 font-mono text-base text-gold">
+                    {item.digits
+                      ? item.digits.map((d, di) => (
+                          <span key={di} className={mark === di ? "text-white" : ""}>
+                            {d}
+                            {di < item.digits!.length - 1 ? " – " : ""}
+                          </span>
+                        ))
+                      : item.answer}
+                  </p>
+                )}
+              </div>
+            ) : settings.showKey && !seg ? (
               <p className="mt-1 text-xl text-parchment">
                 Target: <span className="font-mono text-gold">{item.answer}</span>
               </p>

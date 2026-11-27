@@ -1,7 +1,7 @@
-# The Isle of Echoes
+# Valley of Echoes
 
-A Myst-inspired island adventure that delivers an **informal phonological screening** (ages 4–14) as a game.
-A Keeper (adult) reads each item aloud and taps whether the child answered correctly; the island supplies the atmosphere,
+A forest-valley adventure that delivers an **informal phonological screening** (ages 4–14) as a game.
+A Keeper (adult) reads each item aloud and taps whether the child answered correctly; the valley supplies the atmosphere,
 the pacing rules and the scoring.
 
 > **Illustrative, non-normed, non-validated material.** Not the CTOPP-2, not a diagnostic instrument. Never use it alone to
@@ -11,24 +11,26 @@ the pacing rules and the scoring.
 
 | Realm (map location) | Subtest | Battery |
 | --- | --- | --- |
-| The Whispering Colonnade | Elision | Phonological Awareness |
-| Weaver’s Landing (dock) | Blending | Phonological Awareness |
-| The Cogworks | Segmentation (tap each gear = proportion correct) | Phonological Awareness |
-| The Dome Observatory | Phoneme Isolation | Phonological Awareness |
-| The Star Skiff (rocket) | Nonword Elision / Blending | Phonological Awareness |
-| The Numbered Library | Memory for Digits (1 digit / sec voice) | Phonological Memory |
+| The Whispering Chimes | Elision | Phonological Awareness |
+| Weaver’s Landing | Blending | Phonological Awareness |
+| The Patchwork Windmill | Segmentation (tap each gear = proportion correct) | Phonological Awareness |
+| The Stargazer’s Nest | Phoneme Isolation | Phonological Awareness |
+| The Star Skiff | Nonword Elision / Blending | Phonological Awareness |
+| The Hollow Library | Memory for Digits (1 digit / sec voice) | Phonological Memory |
 | Echo Peak | Nonword Repetition | Phonological Memory |
-| The Tilted Tower | Rapid Digit / Letter / Color / Shape Naming (timer + error tiles) | Rapid Naming |
+| The Lantern Treehouse | Rapid Digit / Letter / Color / Shape Naming (timer + error tiles) | Rapid Naming |
 
 Rules taken from the Administration & Scoring Guide:
 
 - **Tier by age** (0: 4–6, 1: 7–8, 2: 9–11, 3: 12–14). Items are drawn at random without repeats from the 100-item pool per tier,
   then ordered by item number (difficulty).
-- **Basal rule:** if the first 3 items are missed (first 2 for the memory subtests, which stop after 2 misses anyway), the island offers
+- **Basal rule:** if the first 3 items are missed (first 2 for the memory subtests, which stop after 2 misses anyway), the valley offers
   to step back one tier. At Tier 0 it records a below-floor score of 0.
 - **Ceiling rule:** 5 consecutive misses end a Phonological Awareness realm; 2 end a Memory realm.
 - **Rapid naming:** one complete 9-column grid per wall (Forms A–E), practice row first, stopwatch, tap tiles for errors
   (once = error, twice = self-corrected). At Tier 0 Digit/Letter are gated on the practice row.
+- **Memory items stay hidden:** digits and nonwords are not shown on screen. The Keeper taps “Show item” to see one (needed when
+  the voice is off), after turning the screen away from the child.
 - **Ledger:** per-battery tables, print view and CSV export. No composite is computed.
 - **The Keeper’s Letter:** an optional button on the ledger asks Claude to turn the tables into plain-language cards for the
   adult (see below).
@@ -55,7 +57,7 @@ src/
   app/                  / (title) · /setup · /island · /play/[id] · /ledger · api/letter, api/narrate
   components/
     art.tsx             SVG scenery (columns, gears, dome, library, rocket, tower, forest, sea, sky)
-    IslandMap.tsx       the interactive island, built from the same pieces
+    IslandMap.tsx       the interactive valley map over public/art/valley-map.jpg
     SceneBackdrop.tsx   a full-screen scene per realm
     play/               ItemTrial (7 subtests) · RapidTrial · shared parts
     SessionProvider.tsx in-memory session (settings + results)
@@ -69,9 +71,10 @@ src/
 
 ## Visual direction
 
-Weathered sandstone columns, rusted iron gears, moss on basalt, hazy gold light over a deep sea-and-sky blue, with a
-MYST-style amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. Every scene is drawn in code
-as SVG; no third-party artwork is included.
+The title and map screens use a painted dusk forest valley (`public/art/valley-map.jpg`, generated with ElevenLabs), with an
+amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. All eight realm scenes are painted
+too (setup shares The Whispering Chimes), as is the Archivist, a silver fox. The map-page and ledger backgrounds are still
+the earlier code-drawn SVG.
 
 ## The Keeper’s Letter
 

@@ -10,6 +10,8 @@ export default function Title() {
           <IslandMap interactive={false} fit="slice" />
         </div>
         <div className="vignette absolute inset-0 -z-10" />
+        {/* darkens the sky so the title reads over the painted map */}
+        <div className="absolute inset-x-0 top-0 -z-10 h-[48%] bg-gradient-to-b from-abyss/85 via-abyss/55 to-transparent" />
 
         <div className="mx-auto w-full max-w-6xl px-6 pt-10 text-center md:pt-14">
           <p className="eyebrow rise">An informal phonological screening · ages 4–14</p>
@@ -17,7 +19,7 @@ export default function Title() {
             className="title-wash rise mt-4 text-[clamp(2.2rem,7.2vw,5.6rem)] leading-[1.02] tracking-[0.12em] uppercase"
             style={{ animationDelay: "0.15s" }}
           >
-            The Isle
+            Valley
             <span className="block">of Echoes</span>
           </h1>
         </div>
@@ -29,13 +31,13 @@ export default function Title() {
             className="rise max-w-xl rounded bg-gradient-to-r from-abyss/75 to-abyss/20 p-4 text-xl text-bone italic md:text-2xl"
             style={{ animationDelay: "0.4s" }}
           >
-            Eight realms wait on a silent island. In each, a Keeper and a young traveler trade sounds, words and numbers, and the island
+            Eight realms wait in a silent valley. In each, a Keeper and a young traveler trade sounds, words and numbers, and the valley
             answers back.
           </p>
           <div className="rise flex flex-col gap-3 sm:flex-row md:flex-col md:items-stretch" style={{ animationDelay: "0.6s" }}>
             <Greeting />
             <Link href="/setup" className="btn btn-brass">
-              Step onto the island
+              Step into the valley
             </Link>
             <a href="#keeper-note" className="btn btn-stone bg-abyss/50 backdrop-blur">
               Note for the Keeper

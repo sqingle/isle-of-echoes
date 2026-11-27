@@ -51,13 +51,13 @@ export default function Setup() {
       <SceneBackdrop scene="elision" dim={0.45} />
       <div className="mx-auto max-w-3xl">
         <Link href="/" className="eyebrow hover:text-gold">
-          ← The shore
+          ← The start
         </Link>
         <div className="plaque rise mt-4 p-6 md:p-10">
           <p className="eyebrow">The Keeper’s ledger</p>
           <h1 className="engraved mt-2 text-3xl text-bone md:text-4xl">Prepare the crossing</h1>
           <p className="mt-3 text-lg text-parchment/80">
-            Choose where the traveler begins. Each realm opens at this tier; the island will step back a tier on its own if the first three
+            Choose where the traveler begins. Each realm opens at this tier; the valley will step back a tier on its own if the first three
             echoes are missed.
           </p>
 
