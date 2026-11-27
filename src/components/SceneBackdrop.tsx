@@ -10,7 +10,6 @@ import {
   Lamp,
   Library,
   PeakTank,
-  Rocket,
   Sea,
   Sky,
   TiltedTower,
@@ -21,42 +20,6 @@ const P = "bd";
 const W = 1600;
 const H = 900;
 const HZ = 470;
-
-/** mossy basalt boulders across the foreground, like the shoreline in the reference scenes */
-function Rocks({ y, h, seed, count = 26 }: { y: number; h: number; seed: number; count?: number }) {
-  const rand = rng(seed);
-  const rocks = Array.from({ length: count }).map(() => {
-    const w = 70 + rand() * 150;
-    const x = rand() * (W + 100) - 50;
-    const yy = y + rand() * h;
-    const rh = 34 + rand() * 70;
-    const pts = [
-      [x - w / 2, yy],
-      [x - w * 0.42, yy - rh * 0.7],
-      [x - w * 0.1, yy - rh],
-      [x + w * 0.3, yy - rh * 0.9],
-      [x + w / 2, yy - rh * 0.2],
-      [x + w * 0.45, yy],
-    ];
-    return { x, yy, w, rh, pts, hue: rand() };
-  });
-  rocks.sort((a, b) => a.yy - b.yy);
-  return (
-    <g>
-      {rocks.map((r, i) => (
-        <g key={i}>
-          <polygon points={r.pts.map((p) => p.join(",")).join(" ")} fill={r.hue > 0.5 ? "#4a4e49" : "#3b3f3c"} />
-          <polygon
-            points={[r.pts[1], r.pts[2], r.pts[3], [r.x + r.w * 0.2, r.yy - r.rh * 0.62], [r.x - r.w * 0.25, r.yy - r.rh * 0.55]].map((p) => p.join(",")).join(" ")}
-            fill={r.hue > 0.3 ? "#6f8b3c" : "#82923f"}
-            opacity="0.85"
-          />
-          <polygon points={`${r.pts[3].join(",")} ${r.pts[4].join(",")} ${r.pts[5].join(",")} ${r.x + r.w * 0.1},${r.yy}`} fill="#000" opacity="0.28" />
-        </g>
-      ))}
-    </g>
-  );
-}
 
 function Basalt({ x, y, n, seed, w = 46 }: { x: number; y: number; n: number; seed: number; w?: number }) {
   const rand = rng(seed);
@@ -93,27 +56,13 @@ export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   blending: "/art/weavers-landing.jpg",
   segmentation: "/art/patchwork-windmill.jpg",
   isolation: "/art/stargazers-nest.jpg",
+  nonwordEB: "/art/star-skiff.jpg",
 };
 
 function Scene({ id }: { id: LocationId | "haze" }) {
   const painting = PAINTED[id];
   if (painting) return <image href={painting} width={W} height={H} />;
   switch (id) {
-    case "nonwordEB":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 800, y: 180 }} />
-          <Clouds p={P} w={W} y={90} scale={1.6} seed={23} />
-          <Bird x={1220} y={170} s={1.8} />
-          <Sea p={P} w={W} y={HZ} h={H - HZ} glints={80} seed={2} />
-          <rect x="360" y="660" width="880" height="34" fill="#868c88" />
-          <rect x="360" y="694" width="880" height="206" fill="#2d3235" />
-          <At x={800} y={650} s={6.2}>
-            <Rocket p={P} />
-          </At>
-          <Rocks y={800} h={100} seed={44} count={18} />
-        </>
-      );
     case "digits":
       return (
         <>
