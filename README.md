@@ -29,6 +29,8 @@ Rules taken from the Administration & Scoring Guide:
 - **Ceiling rule:** 5 consecutive misses end a Phonological Awareness realm; 2 end a Memory realm.
 - **Rapid naming:** one complete 9-column grid per wall (Forms A–E), practice row first, stopwatch, tap tiles for errors
   (once = error, twice = self-corrected). At Tier 0 Digit/Letter are gated on the practice row.
+- **Memory items stay hidden:** digits and nonwords are not shown on screen. The Keeper taps “Show item” to see one (needed when
+  the voice is off), after turning the screen away from the child.
 - **Ledger:** per-battery tables, print view and CSV export. No composite is computed.
 - **The Keeper’s Letter:** an optional button on the ledger asks Claude to turn the tables into plain-language cards for the
   adult (see below).
