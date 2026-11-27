@@ -72,9 +72,9 @@ export default function Island() {
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <section className="plaque flex min-h-[10.5rem] flex-wrap items-center justify-center gap-5 p-6 sm:flex-nowrap" aria-live="polite">
+          <section className="plaque flex min-h-[10.5rem] flex-col items-center justify-center gap-5 p-6 sm:flex-row" aria-live="polite">
             <Archivist speaking={speaking} onReplay={voiceOn ? replay : undefined} />
-            <div className="min-w-0 flex-1">
+            <div className="w-full min-w-0 sm:flex-1">
             {sel ? (
               <div className="rise" key={sel.id}>
                 <p className="eyebrow">
