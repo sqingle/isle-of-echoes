@@ -5,7 +5,6 @@ import {
   Bird,
   Boat,
   Clouds,
-  Dome,
   Fog,
   Forest,
   Lamp,
@@ -93,25 +92,13 @@ export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   elision: "/art/whispering-chimes.jpg",
   blending: "/art/weavers-landing.jpg",
   segmentation: "/art/patchwork-windmill.jpg",
+  isolation: "/art/stargazers-nest.jpg",
 };
 
 function Scene({ id }: { id: LocationId | "haze" }) {
   const painting = PAINTED[id];
   if (painting) return <image href={painting} width={W} height={H} />;
   switch (id) {
-    case "isolation":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 300, y: 160 }} />
-          <Clouds p={P} w={W} y={50} scale={1.3} seed={17} />
-          <Sea p={P} w={W} y={HZ} h={H - HZ} glints={90} seed={12} />
-          <Fog p={P} w={W} y={HZ - 40} h={120} opacity={0.6} />
-          <At x={800} y={830} s={8.4}>
-            <Dome p={P} />
-          </At>
-          <Rocks y={820} h={80} seed={41} count={16} />
-        </>
-      );
     case "nonwordEB":
       return (
         <>
