@@ -26,7 +26,7 @@ export default function Title() {
 
         <div className="flex-1" />
 
-        <div className="mx-auto grid w-full max-w-6xl items-end gap-6 px-6 pb-8 md:grid-cols-[1fr_auto] md:pb-12">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-end gap-6 px-6 pb-8 md:grid-cols-[minmax(0,1fr)_auto] md:pb-12">
           <p
             className="rise max-w-xl rounded bg-gradient-to-r from-abyss/75 to-abyss/20 p-4 text-xl text-bone italic md:text-2xl"
             style={{ animationDelay: "0.4s" }}

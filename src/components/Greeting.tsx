@@ -10,7 +10,7 @@ export function Greeting() {
   const { speaking, replay } = useNarrate(STORY, false, "story");
   if (!can) return null;
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
       <Archivist speaking={speaking} onReplay={replay} size={72} />
       <button className="btn btn-stone bg-abyss/60 backdrop-blur" onClick={replay}>
         {speaking ? "The Archivist is speaking…" : "Hear the Archivist"}
