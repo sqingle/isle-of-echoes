@@ -1,12 +1,9 @@
 import type { LocationId } from "@/lib/game";
 import {
   ArtDefs,
-  At,
-  Boat,
   Clouds,
   Sea,
   Sky,
-  TiltedTower,
 } from "./art";
 
 const P = "bd";
@@ -14,7 +11,7 @@ const W = 1600;
 const H = 900;
 const HZ = 470;
 
-/** realms that have a painted scene; the rest are still drawn in code */
+/** the painted scene for each realm */
 export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   elision: "/art/whispering-chimes.jpg",
   blending: "/art/weavers-landing.jpg",
@@ -23,35 +20,20 @@ export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   nonwordEB: "/art/star-skiff.jpg",
   digits: "/art/hollow-library.jpg",
   nonwordRep: "/art/echo-peak.jpg",
+  rapid: "/art/lantern-treehouse.jpg",
 };
 
 function Scene({ id }: { id: LocationId | "haze" }) {
   const painting = PAINTED[id];
   if (painting) return <image href={painting} width={W} height={H} />;
-  switch (id) {
-    case "rapid":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 1180, y: 200 }} />
-          <Clouds p={P} w={W} y={60} scale={1.3} seed={43} />
-          <Sea p={P} w={W} y={HZ} h={H - HZ} glints={110} seed={6} />
-          <At x={1240} y={780} s={3.4}>
-            <TiltedTower p={P} />
-          </At>
-          <At x={340} y={800} s={2.6}>
-            <Boat />
-          </At>
-        </>
-      );
-    default:
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 300, y: 160 }} />
-          <Clouds p={P} w={W} y={60} scale={1.3} seed={5} />
-          <Sea p={P} w={W} y={HZ} h={H - HZ} glints={110} seed={3} />
-        </>
-      );
-  }
+  // map-page and ledger backgrounds ("haze") are still drawn in code
+  return (
+    <>
+      <Sky p={P} w={W} h={HZ + 60} sun={{ x: 300, y: 160 }} />
+      <Clouds p={P} w={W} y={60} scale={1.3} seed={5} />
+      <Sea p={P} w={W} y={HZ} h={H - HZ} glints={110} seed={3} />
+    </>
+  );
 }
 
 export function SceneBackdrop({ scene = "haze", dim = 0.28 }: { scene?: LocationId | "haze"; dim?: number }) {
