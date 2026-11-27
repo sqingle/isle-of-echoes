@@ -5,10 +5,6 @@ import {
   Bird,
   Boat,
   Clouds,
-  Fog,
-  Forest,
-  Lamp,
-  Library,
   PeakTank,
   Sea,
   Sky,
@@ -41,15 +37,6 @@ function Basalt({ x, y, n, seed, w = 46 }: { x: number; y: number; n: number; se
   );
 }
 
-function Grass({ y }: { y: number }) {
-  return (
-    <g>
-      <path d={`M0 ${y} C300 ${y - 50} 700 ${y - 10} 1100 ${y - 40} S1500 ${y - 10} 1600 ${y - 30} V${H} H0Z`} fill={`url(#${P}-grass)`} />
-      <path d={`M0 ${y + 120} C400 ${y + 80} 900 ${y + 130} 1600 ${y + 90} V${H} H0Z`} fill="#3d5127" opacity="0.8" />
-    </g>
-  );
-}
-
 /** realms that have a painted scene; the rest are still drawn in code */
 export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   elision: "/art/whispering-chimes.jpg",
@@ -57,31 +44,13 @@ export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   segmentation: "/art/patchwork-windmill.jpg",
   isolation: "/art/stargazers-nest.jpg",
   nonwordEB: "/art/star-skiff.jpg",
+  digits: "/art/hollow-library.jpg",
 };
 
 function Scene({ id }: { id: LocationId | "haze" }) {
   const painting = PAINTED[id];
   if (painting) return <image href={painting} width={W} height={H} />;
   switch (id) {
-    case "digits":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 1300, y: 170 }} />
-          <Clouds p={P} w={W} y={60} scale={1.3} seed={29} />
-          <Forest p={P} x0={-40} x1={W + 40} y0={480} y1={600} count={110} seed={51} scale={2.2} />
-          <Grass y={660} />
-          <At x={800} y={800} s={7.2}>
-            <Library p={P} />
-          </At>
-          <At x={250} y={820} s={3}>
-            <Lamp p={P} />
-          </At>
-          <At x={1350} y={820} s={3}>
-            <Lamp p={P} />
-          </At>
-          <Fog p={P} w={W} y={560} h={160} opacity={0.35} />
-        </>
-      );
     case "nonwordRep":
       return (
         <>
