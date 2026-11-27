@@ -70,8 +70,8 @@ src/
 ## Visual direction
 
 The title and map screens use a painted dusk forest valley (`public/art/valley-map.jpg`, generated with ElevenLabs), with an
-amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. The Whispering Chimes (also used on setup) and Weaver’s Landing scenes are
-painted too, and the Archivist is a painted silver fox; the other realm scenes are still the earlier code-drawn SVG and are due to be replaced one at a time.
+amber-to-umber title wash (Cinzel) and Cormorant Garamond body text. The Whispering Chimes (also used on setup), Weaver’s Landing and Patchwork Windmill
+scenes are painted too, and the Archivist is a painted silver fox; the other realm scenes are still the earlier code-drawn SVG and are due to be replaced one at a time.
 
 ## The Keeper’s Letter
 

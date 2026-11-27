@@ -5,11 +5,9 @@ import {
   Bird,
   Boat,
   Clouds,
-  Cogworks,
   Dome,
   Fog,
   Forest,
-  Gear,
   Lamp,
   Library,
   PeakTank,
@@ -94,29 +92,13 @@ function Grass({ y }: { y: number }) {
 export const PAINTED: Partial<Record<LocationId | "haze", string>> = {
   elision: "/art/whispering-chimes.jpg",
   blending: "/art/weavers-landing.jpg",
+  segmentation: "/art/patchwork-windmill.jpg",
 };
 
 function Scene({ id }: { id: LocationId | "haze" }) {
   const painting = PAINTED[id];
   if (painting) return <image href={painting} width={W} height={H} />;
   switch (id) {
-    case "segmentation":
-      return (
-        <>
-          <Sky p={P} w={W} h={HZ + 60} sun={{ x: 1250, y: 140 }} />
-          <Clouds p={P} w={W} y={60} scale={1.2} seed={13} />
-          <Sea p={P} w={W} y={HZ + 40} h={H - HZ} glints={70} seed={8} />
-          <At x={1280} y={640} s={3.4}>
-            <PeakTank p={P} />
-          </At>
-          <At x={1250} y={800} s={5.2}>
-            <Cogworks p={P} />
-          </At>
-          <Rocks y={760} h={140} seed={31} />
-          <Gear p={P} cx={330} cy={690} r={330} teeth={26} spin="fwd" />
-          <Gear p={P} cx={760} cy={840} r={190} teeth={16} spin="rev" holes={5} />
-        </>
-      );
     case "isolation":
       return (
         <>
